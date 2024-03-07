@@ -1,9 +1,9 @@
 import time
-import requests
-import matplotlib.pyplot as plt
+from requests import get
+from matplotlib.pyplot import ylabel, plot, grid, show, xlabel, title
 import os
-from dotenv import load_dotenv
-load_dotenv(".env")
+import dotenv
+dotenv.load_dotenv(".env")
 bearer = os.environ.get("API_KEY")
 
 
@@ -12,8 +12,8 @@ elo_list = []
 
 
 def get_id(nickname):
-    data = requests.get(f"https://open.faceit.com/data/v4/players?nickname={nickname}",
-                        headers={"Authorization": "Bearer " + bearer}).json()
+    data = get(f"https://open.faceit.com/data/v4/players?nickname={nickname}",
+               headers={"Authorization": "Bearer " + bearer}).json()
     if "errors" in data:
         print("Error:", data["errors"][0]["message"])
         main()
@@ -21,18 +21,19 @@ def get_id(nickname):
 
 
 def get_start_elo(nickname):
-    data = requests.get(f"https://open.faceit.com/data/v4/players?nickname={nickname}",
-                        headers={"Authorization": "Bearer " + bearer}).json()
+    data = get(f"https://open.faceit.com/data/v4/players?nickname={nickname}",
+               headers={"Authorization": "Bearer " + bearer}).json()
     if "errors" in data:
         print("Error:",data["errors"][0]["message"])
         main()
     return int(data["games"]["csgo"]["faceit_elo"])
 
+
 def get_matches(count, offset, user_id):
     time.sleep(1)
-    all_matches = requests.get(f"https://open.faceit.com/data/v4/players/{user_id}/history?game={game}"
+    all_matches = get(f"https://open.faceit.com/data/v4/players/{user_id}/history?game={game}"
                                f"&limit={count}&offset={offset}",
-                               headers={"Authorization": "Bearer " + bearer}).json()
+                      headers={"Authorization": "Bearer " + bearer}).json()
     if "errors" in all_matches:
         print("Error:",all_matches["errors"][0]["message"])
         main()
@@ -71,12 +72,12 @@ def show_chart(elo_list):
     for i in range(10, len(full_elo) + 10):
         matches.append(i)
 
-    plt.plot(matches, full_elo)
-    plt.title('Elo Progression')
-    plt.xlabel('Matches')
-    plt.ylabel('Elo')
-    plt.grid()
-    plt.show()
+    plot(matches, full_elo)
+    title('Elo Progression')
+    xlabel('Matches')
+    ylabel('Elo')
+    grid()
+    show()
 
 def main():
     username = input("Enter your Faceit Username: ")
